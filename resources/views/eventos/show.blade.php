@@ -4,12 +4,6 @@
 
 @section('content')
 
-@if(session('sucesso'))
-    <div class="bg-green-100 border border-green-400 text-green-800 rounded-md p-4 mb-6">
-        {{ session('sucesso') }}
-    </div>
-@endif
-
 <div class="mb-6">
     <h1 class="text-3xl font-bold text-white mb-2">
         {{ $evento->titulo }}
@@ -103,13 +97,13 @@
 
     </div>
 
-    <!-- Lista de perguntas publicas -->
+    <!-- Sprint 06 - Ranking de perguntas -->
     <div>
 
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-2">
 
             <h2 class="text-xl font-bold text-white">
-                📋 Perguntas do Evento
+                🏆 Ranking de Perguntas
             </h2>
 
             <span class="text-gray-400 text-sm">
@@ -117,6 +111,10 @@
             </span>
 
         </div>
+
+        <p class="text-gray-400 text-sm mb-5">
+            As perguntas mais votadas aparecem primeiro.
+        </p>
 
         @forelse($perguntas as $pergunta)
 
@@ -132,9 +130,17 @@
 
                     <div class="bg-gray-800 rounded-xl rounded-tl-none p-4 shadow-md">
 
-                        <p class="text-blue-400 font-semibold text-sm mb-2">
-                            {{ $pergunta->user->name ?? 'Anônimo' }}
-                        </p>
+                        <div class="flex justify-between items-center mb-2">
+
+                            <p class="text-blue-400 font-semibold text-sm">
+                                {{ $pergunta->user->name ?? 'Anônimo' }}
+                            </p>
+
+                            <span class="text-yellow-400 font-bold text-sm">
+                                #{{ $perguntas->firstItem() + $loop->index }}
+                            </span>
+
+                        </div>
 
                         <p class="text-white break-words mb-3">
                             {{ $pergunta->texto }}
@@ -152,25 +158,61 @@
 
                         </div>
 
-                        <!-- Sprint 05 - Exclusao autorizada -->
-                        @can('delete', $pergunta)
+                        <!-- Acoes da pergunta -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
 
-                            <form
-                                action="{{ route('perguntas.destroy', $pergunta) }}"
-                                method="POST"
-                                class="mt-4"
-                                onsubmit="return confirm('Tem certeza que deseja excluir esta pergunta?');"
-                            >
-                                @csrf
-                                @method('DELETE')
+                            <!-- Sprint 06 - Botao de voto -->
+                            @auth
 
-                                <x-danger-button class="text-sm">
-                                    Excluir Pergunta
-                                </x-danger-button>
+                                <form action="{{ route('perguntas.votar', $pergunta) }}" method="POST">
 
-                            </form>
+                                    @csrf
 
-                        @endcan
+                                    <button
+                                        type="submit"
+                                        class="inline-flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-sm transition-colors
+                                        {{ $pergunta->usuario_votou
+                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600' }}"
+                                        aria-pressed="{{ $pergunta->usuario_votou ? 'true' : 'false' }}"
+                                        title="{{ $pergunta->usuario_votou ? 'Remover voto' : 'Votar nesta pergunta' }}"
+                                    >
+                                        👍 {{ $pergunta->votos_count }}
+
+                                        {{ $pergunta->usuario_votou ? 'Votado' : 'Votar' }}
+
+                                    </button>
+
+                                </form>
+
+                            @else
+
+                                <span class="bg-gray-700 text-gray-300 px-4 py-2 rounded-md text-sm">
+                                    👍 {{ $pergunta->votos_count }} votos
+                                </span>
+
+                            @endauth
+
+                            <!-- Sprint 05 - Exclusao autorizada -->
+                            @can('delete', $pergunta)
+
+                                <form
+                                    action="{{ route('perguntas.destroy', $pergunta) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('Tem certeza que deseja excluir esta pergunta?');"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <x-danger-button class="text-sm">
+                                        Excluir Pergunta
+                                    </x-danger-button>
+
+                                </form>
+
+                            @endcan
+
+                        </div>
 
                     </div>
 

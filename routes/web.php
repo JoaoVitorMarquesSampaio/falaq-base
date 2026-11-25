@@ -18,9 +18,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/eventos/{id}/perguntas', [EventoController::class, 'storePergunta'])
         ->name('eventos.perguntas.store');
 
-    // Sprint 05 - Exclusao protegida de perguntas
+    // Sprint 05 - Exclusao protegida
     Route::delete('/perguntas/{pergunta}', [EventoController::class, 'destroyPergunta'])
         ->name('perguntas.destroy');
+
+    // Sprint 06 - Votacao protegida
+    Route::post('/perguntas/{pergunta}/votar', [EventoController::class, 'votar'])
+        ->name('perguntas.votar');
 });
 
 // Rotas publicas
