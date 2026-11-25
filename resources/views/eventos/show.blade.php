@@ -4,6 +4,12 @@
 
 @section('content')
 
+@if(session('sucesso'))
+    <div class="bg-green-100 border border-green-400 text-green-800 rounded-md p-4 mb-6">
+        {{ session('sucesso') }}
+    </div>
+@endif
+
 <div class="mb-6">
     <h1 class="text-3xl font-bold text-white mb-2">
         {{ $evento->titulo }}
@@ -118,9 +124,7 @@
 
                 <!-- Avatar -->
                 <div class="shrink-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-
                     {{ mb_strtoupper(mb_substr($pergunta->user->name ?? 'Anônimo', 0, 1)) }}
-
                 </div>
 
                 <!-- Balao de conversa -->
@@ -147,6 +151,26 @@
                             </span>
 
                         </div>
+
+                        <!-- Sprint 05 - Exclusao autorizada -->
+                        @can('delete', $pergunta)
+
+                            <form
+                                action="{{ route('perguntas.destroy', $pergunta) }}"
+                                method="POST"
+                                class="mt-4"
+                                onsubmit="return confirm('Tem certeza que deseja excluir esta pergunta?');"
+                            >
+                                @csrf
+                                @method('DELETE')
+
+                                <x-danger-button class="text-sm">
+                                    Excluir Pergunta
+                                </x-danger-button>
+
+                            </form>
+
+                        @endcan
 
                     </div>
 

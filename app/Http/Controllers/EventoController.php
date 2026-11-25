@@ -21,7 +21,7 @@ class EventoController extends Controller
     {
         $evento = Evento::findOrFail($id);
 
-        $perguntas = Pergunta::with('user')
+        $perguntas = Pergunta::with(['user', 'evento'])
             ->where('evento_id', $evento->id)
             ->where('is_public', true)
             ->latest()
@@ -43,7 +43,7 @@ class EventoController extends Controller
         ]);
 
         return redirect()->route('eventos.show', $evento->id)
-            ->with('sucesso', 'Sua pergunta foi enviada e aguarda moderacao!');
+            ->with('sucesso', 'Sua pergunta foi enviada e aguarda moderação!');
     }
 
     public function create()
@@ -56,5 +56,18 @@ class EventoController extends Controller
         $evento = $request->user()->eventos()->create($request->validated());
 
         return redirect()->route('eventos.show', $evento->id);
+    }
+
+    // Sprint 05 - Exclusao autorizada de perguntas
+    public function destroyPergunta(Pergunta $pergunta)
+    {
+        $this->authorize('delete', $pergunta);
+
+        $eventoId = $pergunta->evento_id;
+
+        $pergunta->delete();
+
+        return redirect()->route('eventos.show', $eventoId)
+            ->with('sucesso', 'Pergunta excluída com sucesso!');
     }
 }

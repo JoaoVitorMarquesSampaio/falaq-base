@@ -14,9 +14,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/eventos', [EventoController::class, 'store'])
         ->name('eventos.store');
 
-    // Ticket #005 - Protecao do envio de perguntas
+    // Sprint 03 - Envio protegido de perguntas
     Route::post('/eventos/{id}/perguntas', [EventoController::class, 'storePergunta'])
         ->name('eventos.perguntas.store');
+
+    // Sprint 05 - Exclusao protegida de perguntas
+    Route::delete('/perguntas/{pergunta}', [EventoController::class, 'destroyPergunta'])
+        ->name('perguntas.destroy');
 });
 
 // Rotas publicas
