@@ -23,6 +23,7 @@ class EventoController extends Controller
 
         $perguntas = Pergunta::with('user')
             ->where('evento_id', $evento->id)
+            ->where('is_public', true)
             ->latest()
             ->paginate(10);
 
@@ -38,10 +39,11 @@ class EventoController extends Controller
             'user_id'   => Auth::id(),
             'texto'     => $request->input('texto'),
             'status'    => 'pendente',
+            'is_public' => false,
         ]);
 
         return redirect()->route('eventos.show', $evento->id)
-            ->with('sucesso', 'Sua pergunta foi enviada com sucesso!');
+            ->with('sucesso', 'Sua pergunta foi enviada e aguarda moderacao!');
     }
 
     public function create()
