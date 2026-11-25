@@ -59,6 +59,11 @@
             <div class="card mb-3 shadow-sm border-start border-4 border-primary">
                 <div class="card-body">
 
+                    <!-- Ticket #003 e #004: Autor da pergunta -->
+                    <div class="fw-bold text-primary mb-2">
+                        👤 {{ $pergunta->user->name ?? 'Anônimo' }}
+                    </div>
+
                     <p class="fs-5 mb-2 text-white">
                         {{ $pergunta->texto }}
                     </p>
