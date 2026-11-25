@@ -3,6 +3,7 @@
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ModeracaoController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas protegidas por autenticacao
@@ -25,6 +26,18 @@ Route::middleware('auth')->group(function () {
     // Sprint 06 - Votacao protegida
     Route::post('/perguntas/{pergunta}/votar', [EventoController::class, 'votar'])
         ->name('perguntas.votar');
+
+    // Sprint 07 - Registrar denuncia
+    Route::post('/perguntas/{pergunta}/moderar', [ModeracaoController::class, 'store'])
+        ->name('moderacoes.store');
+
+    // Sprint 07 - Painel de moderacao
+    Route::get('/eventos/{evento}/moderacoes', [ModeracaoController::class, 'index'])
+        ->name('moderacoes.index');
+
+    // Sprint 07 - Atualizar status da denuncia
+    Route::patch('/moderacoes/{moderacao}/status', [ModeracaoController::class, 'updateStatus'])
+        ->name('moderacoes.updateStatus');
 });
 
 // Rotas publicas

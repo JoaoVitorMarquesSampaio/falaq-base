@@ -5,13 +5,28 @@
 @section('content')
 
 <div class="mb-6">
-    <h1 class="text-3xl font-bold text-white mb-2">
-        {{ $evento->titulo }}
-    </h1>
+
+    <div class="flex flex-wrap justify-between items-center gap-3">
+
+        <h1 class="text-3xl font-bold text-white mb-2">
+            {{ $evento->titulo }}
+        </h1>
+
+        @can('moderate', $evento)
+
+            <a href="{{ route('moderacoes.index', $evento) }}"
+                class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 font-semibold no-underline">
+                🛡️ Painel de Moderação
+            </a>
+
+        @endcan
+
+    </div>
 
     <p class="text-gray-400">
         {{ $evento->descricao }}
     </p>
+
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -28,6 +43,7 @@
             @auth
 
                 <form action="{{ route('eventos.perguntas.store', $evento->id) }}" method="POST">
+
                     @csrf
 
                     <input type="hidden" name="evento_id" value="{{ $evento->id }}">
@@ -97,7 +113,7 @@
 
     </div>
 
-    <!-- Sprint 06 - Ranking de perguntas -->
+    <!-- Ranking de perguntas -->
     <div>
 
         <div class="flex justify-between items-center mb-2">
@@ -159,9 +175,9 @@
                         </div>
 
                         <!-- Acoes da pergunta -->
-                        <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+                        <div class="flex flex-wrap items-center gap-3 mt-4">
 
-                            <!-- Sprint 06 - Botao de voto -->
+                            <!-- Sprint 06 - Votacao -->
                             @auth
 
                                 <form action="{{ route('perguntas.votar', $pergunta) }}" method="POST">
@@ -201,6 +217,7 @@
                                     method="POST"
                                     onsubmit="return confirm('Tem certeza que deseja excluir esta pergunta?');"
                                 >
+
                                     @csrf
                                     @method('DELETE')
 
@@ -213,6 +230,84 @@
                             @endcan
 
                         </div>
+
+                        <!-- Sprint 07 - Denuncia sem Bootstrap collapse -->
+                        @auth
+
+                            <details
+                                class="mt-3"
+                                @if(old('pergunta_denunciada') == $pergunta->id && $errors->has('motivo'))
+                                    open
+                                @endif
+                            >
+
+                                <summary
+                                    class="inline-block cursor-pointer list-none bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 font-semibold text-sm"
+                                >
+                                    ⚠️ Denunciar
+                                </summary>
+
+                                <div class="bg-gray-900 border border-gray-700 rounded-md p-4 mt-3">
+
+                                    <h3 class="text-white font-semibold mb-3">
+                                        Denunciar pergunta
+                                    </h3>
+
+                                    <form action="{{ route('moderacoes.store', $pergunta) }}" method="POST">
+
+                                        @csrf
+
+                                        <input
+                                            type="hidden"
+                                            name="pergunta_denunciada"
+                                            value="{{ $pergunta->id }}"
+                                        >
+
+                                        <label
+                                            for="motivo-{{ $pergunta->id }}"
+                                            class="block text-gray-300 text-sm mb-2"
+                                        >
+                                            Motivo da denúncia
+                                        </label>
+
+                                        <textarea
+                                            name="motivo"
+                                            id="motivo-{{ $pergunta->id }}"
+                                            rows="3"
+                                            placeholder="Explique o motivo da denúncia..."
+                                            class="w-full bg-gray-800 text-white border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 {{ old('pergunta_denunciada') == $pergunta->id && $errors->has('motivo') ? 'border-red-500' : 'border-gray-600' }}"
+                                        >{{ old('pergunta_denunciada') == $pergunta->id ? old('motivo') : '' }}</textarea>
+
+                                        @if(old('pergunta_denunciada') == $pergunta->id)
+
+                                            @error('motivo')
+
+                                                <p class="text-red-500 text-sm mt-1">
+                                                    {{ $message }}
+                                                </p>
+
+                                            @enderror
+
+                                        @endif
+
+                                        <p class="text-gray-400 text-xs mt-2 mb-3">
+                                            Informe um motivo entre 10 e 255 caracteres.
+                                        </p>
+
+                                        <button
+                                            type="submit"
+                                            class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 font-semibold text-sm"
+                                        >
+                                            Enviar Denúncia
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </details>
+
+                        @endauth
 
                     </div>
 
